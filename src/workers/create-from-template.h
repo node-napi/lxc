@@ -1,5 +1,6 @@
 #include <napi.h>
 #include <lxc/lxccontainer.h>
+#include <sstream>
 
 class CreateFromTemplateWorker : public Napi::AsyncWorker {
 public:
@@ -9,7 +10,9 @@ public:
     void Execute() override {
         if (!c->createl(c, "download", NULL, NULL, LXC_CREATE_QUIET,
                        "-d", distro.c_str(), "-r", release.c_str(), "-a", arch.c_str(), NULL)) {
-            SetError("Failed to create container rootfs");
+            std::ostringstream oss;
+            oss << "Failed to create container rootfs" << " (Error " << c->error_num << ": " << c->error_string << ")";
+            SetError(oss.str());
         }
     }
 

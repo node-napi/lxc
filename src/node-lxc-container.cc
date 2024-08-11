@@ -16,6 +16,8 @@ public:
 private:
 	static Napi::FunctionReference constructor;
 	struct lxc_container *c;
+	std::string config;
+	std::string lxc_path;
 
 	Napi::Value CreateFromTemplate(const Napi::CallbackInfo& info);
 	Napi::Value Start(const Napi::CallbackInfo& info);
@@ -48,11 +50,36 @@ LxcContainer::LxcContainer(const Napi::CallbackInfo& info) : Napi::ObjectWrap<Lx
 	Napi::Env env = info.Env();
 	Napi::HandleScope scope(env);
 
-	std::string name = info[0].As<Napi::String>().Utf8Value();
+	if (!info[0].IsObject()) {
+        Napi::TypeError::New(env, "Expected an object as the first argument").ThrowAsJavaScriptException();
+        return;
+    }
+
+	Napi::Object params = info[0].As<Napi::Object>();
+
+    std::string name = params.Get("name").As<Napi::String>().Utf8Value();
+    this->lxc_path = params.Has("lxcPath") ? params.Get("lxcPath").As<Napi::String>().Utf8Value() : "";
+    this->config = params.Has("config") ? params.Get("config").As<Napi::String>().Utf8Value() : "";
+
 	this->c = lxc_container_new(name.c_str(), NULL);
+	
 	if (!this->c) {
 		Napi::TypeError::New(env, "Failed to setup lxc_container struct").ThrowAsJavaScriptException();
 	}
+	if (!this->lxc_path.empty()) {
+		if (!this->c->set_config_path(this->c, this->lxc_path.c_str())) {
+			Napi::TypeError::New(env, "Failed to set lxc path").ThrowAsJavaScriptException();
+            lxc_container_put(this->c);
+            this->c = nullptr;
+		}
+	}
+	if (!config.empty()) {
+        if (!this->c->save_config(this->c, this->config.c_str())) {
+            Napi::TypeError::New(env, "Failed to load LXC container config").ThrowAsJavaScriptException();
+            lxc_container_put(this->c);
+            this->c = nullptr;
+        }
+    }
 }
 
 LxcContainer::~LxcContainer() {
