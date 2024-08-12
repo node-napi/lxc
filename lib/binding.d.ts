@@ -3,66 +3,66 @@
  */
 export type LxcContainer = any;
 export type AttachOptions = {
-    /**
-     * - Flags to control the attach behavior.
-     */
-    attachFlags?: number;
-    /**
-     * - Namespaces to be used.
-     */
-    namespaces?: number;
-    /**
-     * - Personality to be set.
-     */
-    personality?: number;
-    /**
-     * - Initial working directory.
-     */
-    initialCwd?: string;
-    /**
-     * - User ID to be set.
-     */
-    uid?: number;
-    /**
-     * - Group ID to be set.
-     */
-    gid?: number;
-    /**
-     * - Environment policy to be set.
-     */
-    envPolicy?: number;
-    /**
-     * - Extra environment variables.
-     */
-    extraEnvVars?: string[];
-    /**
-     * - Extra environment variables to keep.
-     */
-    extraKeepEnv?: string[];
-    /**
-     * - File descriptor for standard input.
-     */
-    stdinFd?: number;
-    /**
-     * - File descriptor for standard output.
-     */
-    stdoutFd?: number;
-    /**
-     * - File descriptor for standard error.
-     */
-    stderrFd?: number;
-    /**
-     * - File descriptor for logging.
-     */
-    logFd?: number;
-    /**
-     * - LSM (Linux Security Module) label.
-     */
-    lsmLabel?: string;
-    /**
-     * - Array of group IDs.
-     */
-    groups?: number[];
+  /**
+   * - Flags to control the attach behavior.
+   */
+  attachFlags?: number;
+  /**
+   * - Namespaces to be used.
+   */
+  namespaces?: number;
+  /**
+   * - Personality to be set.
+   */
+  personality?: number;
+  /**
+   * - Initial working directory.
+   */
+  initialCwd?: string;
+  /**
+   * - User ID to be set.
+   */
+  uid?: number;
+  /**
+   * - Group ID to be set.
+   */
+  gid?: number;
+  /**
+   * - Environment policy to be set.
+   */
+  envPolicy?: number;
+  /**
+   * - Extra environment variables.
+   */
+  extraEnvVars?: string[];
+  /**
+   * - Extra environment variables to keep.
+   */
+  extraKeepEnv?: string[];
+  /**
+   * - File descriptor for standard input.
+   */
+  stdinFd?: number;
+  /**
+   * - File descriptor for standard output.
+   */
+  stdoutFd?: number;
+  /**
+   * - File descriptor for standard error.
+   */
+  stderrFd?: number;
+  /**
+   * - File descriptor for logging.
+   */
+  logFd?: number;
+  /**
+   * - LSM (Linux Security Module) label.
+   */
+  lsmLabel?: string;
+  /**
+   * - Array of group IDs.
+   */
+  groups?: number[];
 };
 /**
  * @typedef {Object} AttachOptions
