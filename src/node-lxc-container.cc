@@ -5,6 +5,13 @@
 #include "workers/stop-container.h"
 #include "workers/start-container.h"
 #include "workers/destroy-container.h"
+#include "workers/shutdown-container.h"
+#include "workers/reboot-container.h"
+#include "workers/get-ips.h"
+#include "workers/get-interfaces.h"
+#include "workers/query-console.h"
+#include "workers/list-containers.h"
+#include "workers/wait.h"
 
 
 class LxcContainer : public Napi::ObjectWrap<LxcContainer> {
@@ -15,6 +22,7 @@ public:
 
 private:
 	static Napi::FunctionReference constructor;
+	static Napi::Value ListContainers(const Napi::CallbackInfo& info);
 	struct lxc_container *c;
 	std::string config;
 	std::string lxc_path;
@@ -25,6 +33,13 @@ private:
 	Napi::Value Destroy(const Napi::CallbackInfo& info);
 	Napi::Value GetState(const Napi::CallbackInfo& info);
 	Napi::Value GetPid(const Napi::CallbackInfo& info);
+	Napi::Value Reboot(const Napi::CallbackInfo& info);
+    Napi::Value Shutdown(const Napi::CallbackInfo& info);
+	Napi::Value GetIPs(const Napi::CallbackInfo& info);
+	Napi::Value GetInterfaces(const Napi::CallbackInfo& info);
+	Napi::Value QueryConsole(const Napi::CallbackInfo& info);
+	Napi::Value Wait(const Napi::CallbackInfo& info);
+
 };
 
 Napi::FunctionReference LxcContainer::constructor;
@@ -37,6 +52,14 @@ Napi::Object LxcContainer::Init(Napi::Env env, Napi::Object exports) {
 		InstanceMethod("destroy", &LxcContainer::Destroy),
 		InstanceMethod("getState", &LxcContainer::GetState),
 		InstanceMethod("getPid", &LxcContainer::GetPid),
+		InstanceMethod("reboot", &LxcContainer::Reboot),
+        InstanceMethod("shutdown", &LxcContainer::Shutdown),
+		InstanceMethod("getIps", &LxcContainer::GetIPs),
+		InstanceMethod("getInterfaces", &LxcContainer::GetInterfaces),
+		InstanceMethod("queryConsole", &LxcContainer::QueryConsole),
+		InstanceMethod("wait", &LxcContainer::Wait),
+		StaticMethod("listContainers", &LxcContainer::ListContainers)
+
 	});
 
 	constructor = Napi::Persistent(func);
@@ -125,6 +148,26 @@ Napi::Value LxcContainer::Stop(const Napi::CallbackInfo& info) {
     return worker->GetPromise();
 }
 
+Napi::Value LxcContainer::Shutdown(const Napi::CallbackInfo& info) {
+	Napi::Env env = info.Env();
+	Napi::HandleScope scope(env);
+    int seconds = info[0].As<Napi::Number>().Uint32Value();
+    ShutdownContainerWorker* worker = new ShutdownContainerWorker(env, this->c, seconds);
+    worker->Queue();
+    return worker->GetPromise();
+}
+
+Napi::Value LxcContainer::Reboot(const Napi::CallbackInfo& info) {
+	Napi::Env env = info.Env();
+	Napi::HandleScope scope(env);
+	int seconds = info[0].As<Napi::Number>().Uint32Value();
+    RebootContainerWorker* worker = new RebootContainerWorker(env, this->c, seconds);
+    worker->Queue();
+    return worker->GetPromise();
+}
+
+
+
 Napi::Value LxcContainer::Destroy(const Napi::CallbackInfo& info) {
 	Napi::Env env = info.Env();
 	Napi::HandleScope scope(env);
@@ -141,12 +184,81 @@ Napi::Value LxcContainer::GetState(const Napi::CallbackInfo& info) {
 	return Napi::String::New(env, state);
 }
 
+Napi::Value LxcContainer::GetIPs(const Napi::CallbackInfo& info) {
+    Napi::Env env = info.Env();
+    std::string interface = info[0].As<Napi::String>();
+    std::string family = info[1].As<Napi::String>();
+    int scope = 0;
+
+    if (info.Length() > 2 && info[2].IsNumber()) {
+        scope = info[2].As<Napi::Number>().Int32Value();
+    }
+    GetIPsWorker* worker = new GetIPsWorker(env, c, interface, family, scope);
+    worker->Queue();
+	return worker->GetPromise();
+}
+
+Napi::Value LxcContainer::GetInterfaces(const Napi::CallbackInfo& info) {
+	Napi::Env env = info.Env();
+	Napi::HandleScope scope(env);
+    GetInterfacesWorker* worker = new GetInterfacesWorker(env, this->c);
+    worker->Queue();
+    return worker->GetPromise();
+}
+
+Napi::Value LxcContainer::QueryConsole(const Napi::CallbackInfo& info) {
+	Napi::Env env = info.Env();
+	Napi::HandleScope scope(env);
+	int max_length = 0;
+
+    if (info.Length() > 0 && info[0].IsNumber()) {
+        max_length = info[0].As<Napi::Number>().Uint32Value();
+	}
+    QueryConsoleWorker* worker = new QueryConsoleWorker(env, this->c, max_length);
+    worker->Queue();
+    return worker->GetPromise();
+}
+
 Napi::Value LxcContainer::GetPid(const Napi::CallbackInfo& info) {
 	Napi::Env env = info.Env();
 	Napi::HandleScope scope(env);
 
 	int pid = this->c->init_pid(this->c);
 	return Napi::Number::New(env, pid);
+}
+
+Napi::Value LxcContainer::ListContainers(const Napi::CallbackInfo& info) {
+    Napi::Env env = info.Env();
+    std::string lxc_path = info[0].As<Napi::String>();
+
+    ListContainersWorker* worker = new ListContainersWorker(env, lxc_path);
+    worker->Queue();
+    return worker->GetPromise();
+}
+
+Napi::Value LxcContainer::Wait(const Napi::CallbackInfo& info) {
+	Napi::Env env = info.Env();
+    Napi::HandleScope scope(env);
+
+    if (info.Length() < 1 || !info[0].IsObject()) {
+        Napi::TypeError::New(env, "Expected an object with state and timeoutSeconds").ThrowAsJavaScriptException();
+        return env.Null();
+    }
+
+    Napi::Object params = info[0].As<Napi::Object>();
+
+    if (!params.Has("state") || !params.Get("state").IsString() ||
+        !params.Has("timeoutSeconds") || !params.Get("timeoutSeconds").IsNumber()) {
+        Napi::TypeError::New(env, "Object must have string property 'state' and number property 'timeoutSeconds'").ThrowAsJavaScriptException();
+        return env.Null();
+    }
+
+    std::string state = params.Get("state").As<Napi::String>();
+    int timeout_seconds = params.Get("timeoutSeconds").As<Napi::Number>().Int32Value();
+
+    WaitWorker* worker = new WaitWorker(env, this->c, state, timeout_seconds);
+    worker->Queue();
+    return worker->GetPromise();
 }
 
 Napi::Object InitAll(Napi::Env env, Napi::Object exports) {
