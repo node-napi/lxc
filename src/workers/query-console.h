@@ -1,3 +1,6 @@
+#ifndef QUERY_CONSOLE_H
+#define QUERY_CONSOLE_H
+
 #include <napi.h>
 #include <errno.h>
 #include <lxc/lxccontainer.h>
@@ -45,3 +48,4 @@ private:
     uint64_t max_read;
     std::string log_output;
 };
+#endif

@@ -1,3 +1,6 @@
+#ifndef START_CONTAINER_H
+#define START_CONTAINER_H
+
 #include <napi.h>
 #include <lxc/lxccontainer.h>
 #include <string>
@@ -31,3 +34,4 @@ private:
     Napi::Promise::Deferred deferred;
     struct lxc_container* c;
 };
+#endif

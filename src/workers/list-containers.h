@@ -1,3 +1,6 @@
+#ifndef LIST_CONTAINERS_H
+#define LIST_CONTAINERS_H
+
 #include <napi.h>
 #include <lxc/lxccontainer.h>
 #include <vector>
@@ -54,3 +57,4 @@ private:
     std::string lxc_path;
     std::vector<std::string> container_names;
 };
+#endif

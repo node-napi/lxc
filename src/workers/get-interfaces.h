@@ -1,3 +1,6 @@
+#ifndef GET_INTERFACES_H
+#define GET_INTERFACES_H
+
 #include <napi.h>
 #include <lxc/lxccontainer.h>
 #include <string>
@@ -37,3 +40,4 @@ private:
     struct lxc_container* c;
     char** interfaces;
 };
+#endif

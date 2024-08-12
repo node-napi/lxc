@@ -1,3 +1,6 @@
+#ifndef CREATE_FROME_TEMPLATE_H
+#define CREATE_FROME_TEMPLATE_H
+
 #include <napi.h>
 #include <lxc/lxccontainer.h>
 #include <sstream>
@@ -37,3 +40,4 @@ private:
     std::string release;
     std::string arch;
 };
+#endif

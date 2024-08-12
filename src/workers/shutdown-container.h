@@ -1,3 +1,6 @@
+#ifndef SHUTDOWN_CONTAINER_H
+#define SHUTDOWN_CONTAINER_H
+
 #include <napi.h>
 #include <lxc/lxccontainer.h>
 #include <string>
@@ -32,3 +35,4 @@ private:
     struct lxc_container* c;
     int shutdown_seconds;
 };
+#endif

@@ -1,3 +1,6 @@
+#ifndef WAIT_H
+#define WAIT_H
+
 #include <napi.h>
 #include <lxc/lxccontainer.h>
 #include <string>
@@ -31,3 +34,4 @@ private:
     std::string state;
     int timeout_seconds;
 };
+#endif

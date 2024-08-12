@@ -50,14 +50,14 @@ test("should start the container", async () => {
 })
 
 test("should wait for the container to be ready", async () => {
-  await assert.doesNotReject(container.wait({
+  await assert.doesNotReject(container.waitForState({
     state: 'RUNNING',
     timeoutSeconds: 30
   }))
 })
 
 test("should timeout for bad state", async () => {
-  await assert.rejects(container.wait({
+  await assert.rejects(container.waitForState({
     state: 'STOPPED',
     timeoutSeconds: 2
   }))

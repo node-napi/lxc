@@ -1,6 +1,7 @@
 #include <napi.h>
 #include <lxc/lxccontainer.h>
 #include <string>
+#include "util/marshalling_utils.h"
 #include "workers/create-from-template.h"
 #include "workers/stop-container.h"
 #include "workers/start-container.h"
@@ -12,6 +13,7 @@
 #include "workers/query-console.h"
 #include "workers/list-containers.h"
 #include "workers/wait.h"
+#include "workers/attach-run-wait.h"
 
 
 class LxcContainer : public Napi::ObjectWrap<LxcContainer> {
@@ -39,6 +41,7 @@ private:
 	Napi::Value GetInterfaces(const Napi::CallbackInfo& info);
 	Napi::Value QueryConsole(const Napi::CallbackInfo& info);
 	Napi::Value Wait(const Napi::CallbackInfo& info);
+	Napi::Value RunWait(const Napi::CallbackInfo& info);
 
 };
 
@@ -57,7 +60,8 @@ Napi::Object LxcContainer::Init(Napi::Env env, Napi::Object exports) {
 		InstanceMethod("getIps", &LxcContainer::GetIPs),
 		InstanceMethod("getInterfaces", &LxcContainer::GetInterfaces),
 		InstanceMethod("queryConsole", &LxcContainer::QueryConsole),
-		InstanceMethod("wait", &LxcContainer::Wait),
+		InstanceMethod("waitForState", &LxcContainer::Wait),
+		InstanceMethod("runWait", &LxcContainer::RunWait),
 		StaticMethod("listContainers", &LxcContainer::ListContainers)
 
 	});
@@ -232,6 +236,40 @@ Napi::Value LxcContainer::ListContainers(const Napi::CallbackInfo& info) {
     std::string lxc_path = info[0].As<Napi::String>();
 
     ListContainersWorker* worker = new ListContainersWorker(env, lxc_path);
+    worker->Queue();
+    return worker->GetPromise();
+}
+
+Napi::Value LxcContainer::RunWait(const Napi::CallbackInfo& info) {
+	Napi::Env env = info.Env();
+    Napi::HandleScope scope(env);
+
+    if (info.Length() < 1 || !info[0].IsObject()) {
+        Napi::TypeError::New(env, "Expected an object with options, program, and argv").ThrowAsJavaScriptException();
+        return env.Null();
+    }
+
+    Napi::Object params = info[0].As<Napi::Object>();
+
+    if (!params.Has("options") || !params.Get("options").IsObject() ||
+        !params.Has("program") || !params.Get("program").IsString() ||
+        !params.Has("argv") || !params.Get("argv").IsArray()) {
+        Napi::TypeError::New(env, "Object must have object property 'options', string property 'program', and array property 'argv'").ThrowAsJavaScriptException();
+        return env.Null();
+    }
+
+    Napi::Object optionsObj = params.Get("options").As<Napi::Object>();
+    std::string program = params.Get("program").As<Napi::String>();
+    Napi::Array argvArray = params.Get("argv").As<Napi::Array>();
+
+    lxc_attach_options_t options = get_attach_options(optionsObj);
+
+    std::vector<std::string> argv;
+    for (uint32_t i = 0; i < argvArray.Length(); ++i) {
+        argv.push_back(argvArray.Get(i).As<Napi::String>());
+    }
+
+    AttachRunWaitWorker* worker = new AttachRunWaitWorker(env, this->c, &options, program, argv);
     worker->Queue();
     return worker->GetPromise();
 }

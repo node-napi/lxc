@@ -1,6 +1,69 @@
-const NodeLxcNative = require('../build/Release/node-lxc-native-native.node');
-
-
+/**
+ * LxcContainer provides bindings for LXC container management.
+ */
+export type LxcContainer = any;
+export type AttachOptions = {
+    /**
+     * - Flags to control the attach behavior.
+     */
+    attachFlags?: number;
+    /**
+     * - Namespaces to be used.
+     */
+    namespaces?: number;
+    /**
+     * - Personality to be set.
+     */
+    personality?: number;
+    /**
+     * - Initial working directory.
+     */
+    initialCwd?: string;
+    /**
+     * - User ID to be set.
+     */
+    uid?: number;
+    /**
+     * - Group ID to be set.
+     */
+    gid?: number;
+    /**
+     * - Environment policy to be set.
+     */
+    envPolicy?: number;
+    /**
+     * - Extra environment variables.
+     */
+    extraEnvVars?: string[];
+    /**
+     * - Extra environment variables to keep.
+     */
+    extraKeepEnv?: string[];
+    /**
+     * - File descriptor for standard input.
+     */
+    stdinFd?: number;
+    /**
+     * - File descriptor for standard output.
+     */
+    stdoutFd?: number;
+    /**
+     * - File descriptor for standard error.
+     */
+    stderrFd?: number;
+    /**
+     * - File descriptor for logging.
+     */
+    logFd?: number;
+    /**
+     * - LSM (Linux Security Module) label.
+     */
+    lsmLabel?: string;
+    /**
+     * - Array of group IDs.
+     */
+    groups?: number[];
+};
 /**
  * @typedef {Object} AttachOptions
  * @property {number} [attachFlags] - Flags to control the attach behavior.
@@ -19,17 +82,14 @@ const NodeLxcNative = require('../build/Release/node-lxc-native-native.node');
  * @property {string} [lsmLabel] - LSM (Linux Security Module) label.
  * @property {number[]} [groups] - Array of group IDs.
  */
-
-
 /**
  * LxcContainer provides bindings for LXC container management.
- * 
+ *
  * @typedef {Object} LxcContainer
  */
-
 /**
  * Creates an LXC container from a template.
- * 
+ *
  * @function
  * @name createFromTemplate
  * @memberof LxcContainer
@@ -37,113 +97,99 @@ const NodeLxcNative = require('../build/Release/node-lxc-native-native.node');
  * @param {string} containerName - The name of the container to create.
  * @returns {Promise<void>}
  */
-
 /**
  * Starts the LXC container.
- * 
+ *
  * @function
  * @name start
  * @memberof LxcContainer
  * @returns {Promise<void>}
  */
-
 /**
  * Stops the LXC container.
- * 
+ *
  * @function
  * @name stop
  * @memberof LxcContainer
  * @returns {Promise<void>}
  */
-
 /**
  * Destroys the LXC container.
- * 
+ *
  * @function
  * @name destroy
  * @memberof LxcContainer
  * @returns {Promise<void>}
  */
-
 /**
  * Gets the state of the LXC container.
- * 
+ *
  * @function
  * @name getState
  * @memberof LxcContainer
  * @returns {Promise<string>} - The state of the container.
  */
-
 /**
  * Gets the PID of the LXC container.
- * 
+ *
  * @function
  * @name getPid
  * @memberof LxcContainer
  * @returns {Promise<number>} - The PID of the container.
  */
-
 /**
  * Reboots the LXC container.
- * 
+ *
  * @function
  * @name reboot
  * @memberof LxcContainer
  * @returns {Promise<void>}
  */
-
 /**
  * Shuts down the LXC container.
- * 
+ *
  * @function
  * @name shutdown
  * @memberof LxcContainer
  * @returns {Promise<void>}
  */
-
 /**
  * Gets the IP addresses of the LXC container.
- * 
+ *
  * @function
  * @name getIps
  * @memberof LxcContainer
  * @instance
  * @returns {Promise<string[]>} - An array of IP addresses.
  */
-
 /**
  * Gets the network interfaces of the LXC container.
- * 
+ *
  * @function
  * @name getInterfaces
  * @memberof LxcContainer
  * @returns {Promise<string[]>} - An array of network interfaces.
  */
-
 /**
  * Queries the console output of the LXC container.
- * 
+ *
  * @function
  * @name queryConsole
  * @memberof LxcContainer
  * @returns {Promise<string>} - The console output.
  */
-
 /**
  * Waits for the LXC container to reach a specific state.
- * 
+ *
  * @function
  * @name waitForState
  * @memberof LxcContainer
  * @param {string} state - The state to wait for.
  * @returns {Promise<void>}
  */
-
-
-
 /**
  * Runs a command and waits for it to finish.
- * 
+ *
  * @function
  * @name runWait
  * @memberof LxcContainer
@@ -153,24 +199,14 @@ const NodeLxcNative = require('../build/Release/node-lxc-native-native.node');
  * @param {AttachOptions} params.options - The attach options.
  * @returns {Promise<number>}
  */
-
 /**
  * Lists all LXC containers.
- * 
+ *
  * @function
  * @name listContainers
  * @memberof LxcContainer
  * @static
  * @returns {Promise<string[]>} - An array of container names.
  */
-
-
 /** @type {LxcContainer} */
-const LxcContainer = NodeLxcNative.LxcContainer
-
-module.exports = {
-  /**
-   * @type {LxcContainer}
-   */
-  LxcContainer
-};
+export const LxcContainer: LxcContainer;

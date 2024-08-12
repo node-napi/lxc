@@ -1,7 +1,8 @@
 {
   "main": "lib/binding.js",
   "scripts": {
-    "test": "node --napi-modules ./test/test_binding.js"
+    "test": "node --napi-modules ./test/test_binding.js",
+    "generate-typings": "tsc --declaration --emitDeclarationOnly --allowJs lib/binding.js"
   },
   "gypfile": true,
   "name": "node-lxc-native",

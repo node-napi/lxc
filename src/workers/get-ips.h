@@ -1,3 +1,6 @@
+#ifndef GET_IPS_H
+#define GET_IPS_H
+
 #include <napi.h>
 #include <lxc/lxccontainer.h>
 #include <string>
@@ -47,3 +50,4 @@ private:
     int scope;
     std::vector<std::string> ipList;
 };
+#endif
