@@ -1,7 +1,3 @@
-/**
- * LxcContainer provides bindings for LXC container management.
- */
-export type LxcContainer = any;
 export type AttachOptions = {
   /**
    * - Flags to control the attach behavior.
@@ -64,6 +60,11 @@ export type AttachOptions = {
    */
   groups?: number[];
 };
+export type CreateFromTemplateOpts = {
+  distro: string;
+  release: string;
+  arch: string;
+};
 /**
  * @typedef {Object} AttachOptions
  * @property {number} [attachFlags] - Flags to control the attach behavior.
@@ -83,130 +84,149 @@ export type AttachOptions = {
  * @property {number[]} [groups] - Array of group IDs.
  */
 /**
- * LxcContainer provides bindings for LXC container management.
- *
- * @typedef {Object} LxcContainer
+ * @typedef {Object} CreateFromTemplateOpts
+ * @property {string} distro
+ * @property {string} release
+ * @property {string} arch
  */
-/**
- * Creates an LXC container from a template.
- *
- * @function
- * @name createFromTemplate
- * @memberof LxcContainer
- * @param {string} templateName - The name of the template to use.
- * @param {string} containerName - The name of the container to create.
- * @returns {Promise<void>}
- */
-/**
- * Starts the LXC container.
- *
- * @function
- * @name start
- * @memberof LxcContainer
- * @returns {Promise<void>}
- */
-/**
- * Stops the LXC container.
- *
- * @function
- * @name stop
- * @memberof LxcContainer
- * @returns {Promise<void>}
- */
-/**
- * Destroys the LXC container.
- *
- * @function
- * @name destroy
- * @memberof LxcContainer
- * @returns {Promise<void>}
- */
-/**
- * Gets the state of the LXC container.
- *
- * @function
- * @name getState
- * @memberof LxcContainer
- * @returns {Promise<string>} - The state of the container.
- */
-/**
- * Gets the PID of the LXC container.
- *
- * @function
- * @name getPid
- * @memberof LxcContainer
- * @returns {Promise<number>} - The PID of the container.
- */
-/**
- * Reboots the LXC container.
- *
- * @function
- * @name reboot
- * @memberof LxcContainer
- * @returns {Promise<void>}
- */
-/**
- * Shuts down the LXC container.
- *
- * @function
- * @name shutdown
- * @memberof LxcContainer
- * @returns {Promise<void>}
- */
-/**
- * Gets the IP addresses of the LXC container.
- *
- * @function
- * @name getIps
- * @memberof LxcContainer
- * @instance
- * @returns {Promise<string[]>} - An array of IP addresses.
- */
-/**
- * Gets the network interfaces of the LXC container.
- *
- * @function
- * @name getInterfaces
- * @memberof LxcContainer
- * @returns {Promise<string[]>} - An array of network interfaces.
- */
-/**
- * Queries the console output of the LXC container.
- *
- * @function
- * @name queryConsole
- * @memberof LxcContainer
- * @returns {Promise<string>} - The console output.
- */
-/**
- * Waits for the LXC container to reach a specific state.
- *
- * @function
- * @name waitForState
- * @memberof LxcContainer
- * @param {string} state - The state to wait for.
- * @returns {Promise<void>}
- */
-/**
- * Runs a command and waits for it to finish.
- *
- * @function
- * @name runWait
- * @memberof LxcContainer
- * @param {Object} params - The parameters for the program to run in the container.
- * @param {string} params.program - The program to run.
- * @param {string[]} params.argv - The arguments to provide to the command/program.
- * @param {AttachOptions} params.options - The attach options.
- * @returns {Promise<number>}
- */
-/**
- * Lists all LXC containers.
- *
- * @function
- * @name listContainers
- * @memberof LxcContainer
- * @static
- * @returns {Promise<string[]>} - An array of container names.
- */
-/** @type {LxcContainer} */
-export const LxcContainer: LxcContainer;
+export class LxcContainer {
+  /**
+   * Lists all LXC containers.
+   *
+   * @function
+   * @name listContainers
+   * @param {string} lxcPath
+   * @static
+   * @returns {Promise<string[]>} - An array of container names.
+   */
+  static listContainers(lxcPath: string): Promise<string[]>;
+  constructor(opts: any);
+  /**
+   * Runs a command and waits for it to finish.
+   *
+   * @function
+   * @name runWait
+   * @memberof LxcContainer
+   * @param {Object} params - The parameters for the program to run in the container.
+   * @param {string} params.program - The program to run.
+   * @param {string[]} params.argv - The arguments to provide to the command/program.
+   * @param {AttachOptions} params.options - The attach options.
+   * @returns {Promise<number>}
+   */
+  runWait(params: {
+    program: string;
+    argv: string[];
+    options: AttachOptions;
+  }): Promise<number>;
+  /**
+   * Queries the console output of the LXC container.
+   *
+   * @function
+   * @name queryConsole
+   * @returns {Promise<string>} - The console output.
+   */
+  queryConsole(): Promise<string>;
+  /**
+   * Gets the network interfaces of the LXC container.
+   *
+   * @function
+   * @name getInterfaces
+   * @returns {Promise<string[]>} - An array of network interfaces.
+   */
+  getInterfaces(): Promise<string[]>;
+  /**
+   * Gets the IP addresses of the LXC container.
+   *
+   * @function
+   * @name getIps
+   * @param {string} interfaceName
+   * @param {string} family
+   * @param {number?} scope
+   * @returns {Promise<string[]>} - An array of IP addresses.
+   */
+  getIps(
+    interfaceName: string,
+    family: string,
+    scope: number | null,
+  ): Promise<string[]>;
+  /**
+   * Gets the PID of the LXC container.
+   *
+   * @function
+   * @name getPid
+   * @returns {Promise<number>} - The PID of the container.
+   */
+  getPid(): Promise<number>;
+  /**
+   * Reboots the LXC container.
+   *
+   * @function
+   * @name reboot
+   * @param {number} timeoutSeconds
+   * @returns {Promise<void>}
+   */
+  reboot(timeoutSeconds: number): Promise<void>;
+  /**
+   * Shuts down the LXC container.
+   *
+   * @function
+   * @name shutdown
+   * @param {number} timeoutSeconds
+   * @returns {Promise<void>}
+   */
+  shutdown(timeoutSeconds: number): Promise<void>;
+  /**
+   * Destroys the LXC container.
+   *
+   * @function
+   * @name destroy
+   * @returns {Promise<void>}
+   */
+  destroy(): Promise<void>;
+  /**
+   * Waits for the LXC container to reach a specific state.
+   *
+   * @function
+   * @name waitForState
+   * @param {string} state - The state to wait for.
+   * @param {number} timeSeconds - The time to wait for the container to enter the state
+   * @returns {Promise<void>}
+   */
+  waitForState(state: string, timeoutSeconds: any): Promise<void>;
+  /**
+   * Gets the state of the LXC container.
+   *
+   * @function
+   * @name getState
+   * @returns {Promise<string>} - The state of the container.
+   */
+  getState(): Promise<string>;
+  /**
+   * Creates an LXC container from a template.
+   *
+   * @function
+   * @name createFromTemplate
+   * @memberof LxcContainer
+   * @param {CreateFromTemplateOpts} opts
+   * @returns {Promise<void>}
+   */
+  createFromTemplate(opts: CreateFromTemplateOpts): Promise<void>;
+  /**
+   * Stops the LXC container.
+   *
+   * @function
+   * @name stop
+   * @param {number} timeoutSeconds
+   * @returns {Promise<void>}
+   */
+  stop(timeoutSeconds: number): Promise<void>;
+  /**
+   * Starts the LXC container.
+   *
+   * @function
+   * @name start
+   * @returns {Promise<void>}
+   */
+  start(): Promise<void>;
+  #private;
+}

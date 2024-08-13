@@ -3,7 +3,7 @@ const { test, before, after } = require('node:test')
 const { tmpdir } = require('node:os')
 const { mkdtemp, mkdir, rm } = require('node:fs/promises')
 const { join } = require('node:path')
-const { LxcContainer } = require('../lib/binding')
+const { LxcContainer } = require('../lib/binding.js')
 
 let workingDir
 let container
