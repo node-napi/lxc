@@ -16,4 +16,4 @@ jobs:
       actions: read
       security-events: write
     with:
-      extra-packages: 'lxc'
+      extra-packages: 'lxc liblxc-dev'
