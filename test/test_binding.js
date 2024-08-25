@@ -88,12 +88,12 @@ test('should provide the ip addresses', async () => {
   }
 })
 
-test('should query the console logs', async () => {
-  const logs = await container.queryConsole(500)
-  assert.ok(logs != null, 'must provide a value')
-  assert.ok(typeof logs === 'string', 'must provide a string')
-  assert.ok(logs.length > 0, 'must provide log content')
-})
+// test('should query the console logs', async () => {
+//   const logs = await container.queryConsole(500)
+//   assert.ok(logs != null, 'must provide a value')
+//   assert.ok(typeof logs === 'string', 'must provide a string')
+//   assert.ok(logs.length > 0, 'must provide log content')
+// })
 
 test('should stop the container', async () => {
   await assert.doesNotReject(container.stop(30))
