@@ -17,3 +17,5 @@ jobs:
       security-events: write
     with:
       extra-packages: 'lxc liblxc-dev'
+      node-versions: '["18.x","20.x", "22.x"]'
+      coverage-version: "18.x"
