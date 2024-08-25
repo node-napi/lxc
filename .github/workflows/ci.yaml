@@ -18,4 +18,4 @@ jobs:
     with:
       extra-packages: 'lxc liblxc-dev'
       node_versions: '["18.x","20.x", "22.x"]'
-      coverage-version: "18.x"
+      node-coverage-version: "18.x"
