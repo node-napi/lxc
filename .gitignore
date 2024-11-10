@@ -1,0 +1,5 @@
+build
+.vagrant
+.vscode
+node_modules
+.devcontainer

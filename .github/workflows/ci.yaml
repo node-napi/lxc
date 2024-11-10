@@ -1,0 +1,21 @@
+name: CI
+on:
+  schedule:
+    - cron: '22 4 * * *'
+  push:
+    branches: ['main']
+  pull_request:
+    branches: ['main']
+
+jobs:
+  validate-node:
+    name: 'Validate'
+    uses: curium-rocks/flows/.github/workflows/node-ts.yml@main
+    permissions:
+      contents: read
+      actions: read
+      security-events: write
+    with:
+      extra-packages: 'lxc liblxc-dev'
+      node_versions: '["18.x","20.x", "22.x"]'
+      node-coverage-version: "18.x"
