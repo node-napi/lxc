@@ -4,14 +4,14 @@ on:
       - published
 jobs:
   validate-node:
-    name: 'Validate'
+    name: "Validate"
     uses: curium-rocks/flows/.github/workflows/node-ts.yml@main
     permissions:
       contents: read
       actions: read
       security-events: write
     with:
-      extra-packages: 'lxc liblxc-dev'
+      extra-packages: "lxc liblxc-dev"
   publish-to-npm:
     environment: npm
     runs-on: ubuntu-latest
